@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="redlib.backend.dao.MembersMapper">
+  <resultMap id="BaseResultMap" type="redlib.backend.model.Members">
+    <id column="member_id" jdbcType="INTEGER" property="memberId" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="balance" jdbcType="DECIMAL" property="balance" />
+    <result column="password" property="password" jdbcType="VARCHAR"/>
+    <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    member_id, phone, name, balance,password, created_at
+  </sql>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from members
+    where member_id = #{memberId,jdbcType=INTEGER}
+  </select>
+
+  <insert id="insertSelective" parameterType="redlib.backend.model.Members" keyProperty="memberId" useGeneratedKeys="true">
+    insert into members
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="memberId != null">
+        member_id,
+      </if>
+      <if test="phone != null">
+        phone,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="balance != null">
+        balance,
+      </if>
+      <if test="password != null">
+        password,
+      </if>
+      <if test="createdAt != null">
+        created_at,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="memberId != null">
+        #{memberId,jdbcType=INTEGER},
+      </if>
+      <if test="phone != null">
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="balance != null">
+        #{balance,jdbcType=DECIMAL},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="createdAt != null">
+        #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="redlib.backend.model.Members">
+    update members
+    <set>
+      <if test="phone != null">
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="balance != null">
+        balance = #{balance,jdbcType=DECIMAL},
+      </if>
+      <if test="password != null">
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="createdAt != null">
+        created_at = #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where member_id = #{memberId,jdbcType=INTEGER}
+  </update>
+
+  <update id="updateByPrimaryKey" parameterType="redlib.backend.model.Members">
+    update members
+    set phone = #{phone,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      balance = #{balance,jdbcType=DECIMAL},
+      password = #{password,jdbcType=VARCHAR},
+      created_at = #{createdAt,jdbcType=TIMESTAMP}
+    where member_id = #{memberId,jdbcType=INTEGER}
+  </update>
+
+  <!-- 获取名字个数(分页) -->
+  <select id="count" resultType="integer">
+    select count(*)
+    from members
+    <where>
+      <if test="phone != null">
+        phone like #{phone}
+      </if>
+      <if test="name != null">
+        and name like #{name}
+      </if>
+    </where>
+  </select>
+
+  <!-- 获取会员信息(分页) -->
+  <select id="list" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from members
+    <where>
+      <if test="queryDTO.name != null and queryDTO.name != ''">
+        name like #{queryDTO.name}
+      </if>
+      <if test="queryDTO.phone != null and queryDTO.phone != ''">
+        and phone like #{queryDTO.phone}
+      </if>
+    </where>
+    limit #{offset}, #{limit}
+  </select>
+
+  <!-- 批量删除 -->
+  <update id="deleteByCodes">
+    delete from members
+    where member_id in
+    <foreach item="item" index="index" collection="codeList" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </update>
+
+</mapper>

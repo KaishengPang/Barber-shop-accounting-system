@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="redlib.backend.dao.ServiceProjectsMapper">
+  <resultMap id="BaseResultMap" type="redlib.backend.model.ServiceProjects">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="project_name" jdbcType="VARCHAR" property="projectName" />
+    <result column="project_fee" jdbcType="DECIMAL" property="projectFee" />
+    <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
+    <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, project_name, project_fee, created_at, updated_at
+  </sql>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from service_projects
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <insert id="insertSelective" parameterType="redlib.backend.model.ServiceProjects">
+    insert into service_projects
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="projectName != null">
+        project_name,
+      </if>
+      <if test="projectFee != null">
+        project_fee,
+      </if>
+      <if test="createdAt != null">
+        created_at,
+      </if>
+      <if test="updatedAt != null">
+        updated_at,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="projectName != null">
+        #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="projectFee != null">
+        #{projectFee,jdbcType=DECIMAL},
+      </if>
+      <if test="createdAt != null">
+        #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedAt != null">
+        #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="redlib.backend.model.ServiceProjects">
+    update service_projects
+    <set>
+      <if test="projectName != null">
+        project_name = #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="projectFee != null">
+        project_fee = #{projectFee,jdbcType=DECIMAL},
+      </if>
+      <if test="createdAt != null">
+        created_at = #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedAt != null">
+        updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <!-- 获取名字个数(分页) -->
+  <select id="count" resultType="integer">
+    select count(*)
+    from service_projects
+    <where>
+      <if test="projectName != null">
+        AND project_name LIKE #{projectName}
+      </if>
+      <!-- 排除包含“非会员”的project_name记录 -->
+      AND project_name NOT LIKE '%非会员%'
+    </where>
+  </select>
+
+
+  <!-- 获取部门(分页) -->
+  <select id="list" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from service_projects
+    <where>
+      <if test="queryDTO.projectName != null">
+        AND project_name LIKE #{queryDTO.projectName}
+      </if>
+      <!-- 排除包含“非会员”的project_name记录 -->
+      AND project_name NOT LIKE '%非会员%'
+    </where>
+    limit #{offset}, #{limit}
+
+  </select>
+
+
+  <update id="deleteByCodes">
+    delete from service_projects
+    where id in
+    <foreach item="item" index="index" collection="codeList" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </update>
+
+  <select id="listForNormal" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from service_projects
+    <where>
+      <if test="queryDTO.projectName != null">
+        <!-- 仅选择包含“非会员”的记录 -->
+        project_name LIKE CONCAT('%', #{queryDTO.projectName}, '%非会员%')
+      </if>
+      <if test="queryDTO.projectName == null">
+        project_name LIKE '%非会员%'
+      </if>
+    </where>
+
+    limit #{offset}, #{limit}
+
+  </select>
+
+  <select id="countForNormal" resultType="integer">
+    select count(*)
+    from service_projects
+    <where>
+      <if test="projectName != null">
+        <!-- 仅统计包含“非会员”的记录 -->
+        project_name LIKE CONCAT('%', #{projectName}, '%非会员%')
+      </if>
+      <!-- 如果没有提供特定的projectName，仍然只统计包含“非会员”的记录 -->
+      <if test="projectName == null">
+        project_name LIKE '%非会员%'
+      </if>
+    </where>
+  </select>
+
+  <!-- 获取名字个数(分页) -->
+  <select id="countForAll" resultType="integer">
+    select count(*)
+    from service_projects
+    <where>
+      <if test="projectName != null">
+        project_name LIKE #{projectName}
+      </if>
+    </where>
+  </select>
+
+
+  <!-- 获取部门(分页) -->
+  <select id="listForAll" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from service_projects
+    <where>
+      <if test="queryDTO.projectName != null">
+        project_name LIKE #{queryDTO.projectName}
+      </if>
+    </where>
+    limit #{offset}, #{limit}
+  </select>
+
+
+</mapper>

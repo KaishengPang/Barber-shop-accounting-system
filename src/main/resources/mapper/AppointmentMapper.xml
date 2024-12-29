@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="redlib.backend.dao.AppointmentMapper">
+  <resultMap id="BaseResultMap" type="redlib.backend.model.Appointment">
+    <id column="appointment_id" jdbcType="INTEGER" property="appointmentId" />
+    <result column="member_id" jdbcType="INTEGER" property="memberId" />
+    <result column="service_project_id" jdbcType="INTEGER" property="serviceProjectId" />
+    <result column="project_name" jdbcType="VARCHAR" property="projectName" />
+    <result column="appointment_start_time" jdbcType="TIMESTAMP" property="appointmentStartTime" />
+    <result column="appointment_end_time" jdbcType="TIMESTAMP" property="appointmentEndTime" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
+    <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    appointment_id, member_id, service_project_id, project_name, appointment_start_time,appointment_end_time, status,
+    remark, created_at, updated_at
+  </sql>
+
+
+
+  <insert id="insertSelective" parameterType="redlib.backend.model.Appointment" keyProperty="appointmentId" useGeneratedKeys="true">
+    insert into appointments
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="appointmentId != null">
+        appointment_id,
+      </if>
+      <if test="memberId != null">
+        member_id,
+      </if>
+      <if test="serviceProjectId != null">
+        service_project_id,
+      </if>
+      <if test="projectName != null">
+        project_name,
+      </if>
+      <if test="appointmentStartTime != null">
+        appointment_start_time,
+      </if>
+      <if test="appointmentEndTime != null">
+        appointment_end_time,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="createdAt != null">
+        created_at,
+      </if>
+      <if test="updatedAt != null">
+        updated_at,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="appointmentId != null">
+        #{appointmentId,jdbcType=INTEGER},
+      </if>
+      <if test="memberId != null">
+        #{memberId,jdbcType=INTEGER},
+      </if>
+      <if test="serviceProjectId != null">
+        #{serviceProjectId,jdbcType=INTEGER},
+      </if>
+      <if test="projectName != null">
+        #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="appointmentStartTime != null">
+        #{appointmentStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="appointmentEndTime != null">
+        #{appointmentEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createdAt != null">
+        #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedAt != null">
+        #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="redlib.backend.model.Appointment">
+    update appointments
+    <set>
+      <if test="memberId != null">
+        member_id = #{memberId,jdbcType=INTEGER},
+      </if>
+      <if test="serviceProjectId != null">
+        service_project_id = #{serviceProjectId,jdbcType=INTEGER},
+      </if>
+      <if test="projectName != null">
+        project_name = #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="appointmentStartTime != null">
+        appointment_start_time = #{appointmentStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="appointmentEndTime != null">
+        appointment_end_time = #{appointmentEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createdAt != null">
+        created_at = #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedAt != null">
+        updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where appointment_id = #{appointmentId,jdbcType=INTEGER}
+  </update>
+
+
+  <select id="count" resultType="integer">
+    select count(*)
+    from appointments
+    <where>
+      <if test="memberId != null">
+        member_id like #{memberId}
+      </if>
+      <if test="projectName != null">
+       AND project_name like CONCAT('%', #{projectName}, '%')
+      </if>
+      <if test="status != null">
+        AND status like #{status}
+      </if>
+      <!-- 添加起止时间条件 -->
+      <if test="appointmentStartTime != null and appointmentEndTime != null">
+        AND (appointment_start_time BETWEEN #{appointmentStartTime} AND #{appointmentEndTime})
+        AND
+        (appointment_end_time BETWEEN #{appointmentStartTime} AND #{appointmentEndTime})
+      </if>
+    </where>
+  </select>
+
+  <select id="list" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from appointments
+    <where>
+      <if test="queryDTO.memberId != null">
+        member_id like #{queryDTO.memberId}
+      </if>
+      <if test="queryDTO.projectName != null">
+        AND project_name LIKE CONCAT('%', #{queryDTO.projectName}, '%')
+      </if>
+      <if test="queryDTO.status != null">
+        AND status like #{queryDTO.status}
+      </if>
+      <!-- 添加起止时间条件 -->
+      <if test="queryDTO.appointmentStartTime != null and queryDTO.appointmentEndTime != null">
+        AND  (appointment_start_time BETWEEN #{queryDTO.appointmentStartTime} AND #{queryDTO.appointmentEndTime} )
+        AND
+        (appointment_end_time BETWEEN #{queryDTO.appointmentStartTime} AND #{queryDTO.appointmentEndTime})
+      </if>
+    </where>
+    limit #{offset}, #{limit}
+  </select>
+
+  <update id="deleteByCodes">
+    delete from appointments
+    where appointment_id in
+    <foreach item="item" index="index" collection="codeList" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </update>
+
+
+</mapper>
