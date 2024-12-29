@@ -1,7 +1,8 @@
 # 理发店记账系统
 
 本项目基于课程：山东大学信息学院崇新学堂-2024Spring-开放性创新与实践1-软件部分-后端 
-后端部分对应的技术文档：[软件详细设计文档.pdf](https://pan.baidu.com/s/1SAHs2DIogKP_O_Zk6rGHbQ?pwd=f9ak)
+
+> 后端部分对应的技术文档：[软件详细设计文档.pdf](https://pan.baidu.com/s/1SAHs2DIogKP_O_Zk6rGHbQ?pwd=f9ak)
 ## 项目要求介绍-理发店记账系统
 
 - 理发店老板现在用 Excel 记录会员充值信息，每次客户消费手动扣除计算余额在写会 Excel 文件。请帮他实现消费的记账管理功能。
